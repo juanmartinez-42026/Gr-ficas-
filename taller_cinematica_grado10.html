@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Taller de Cinemática — Grado 10°</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#f5f3ee;--surface:#fff;--surface2:#f0ede6;
+  --border:rgba(60,55,45,.13);--border2:rgba(60,55,45,.26);
+  --text:#1e1c18;--text2:#5a5650;--text3:#9a9590;
+  --azul:#185FA5;--azul-l:#ddeaf7;--azul-d:#0C447C;
+  --teal:#0F6E56;--teal-l:#d8f0e9;
+  --amber:#BA7517;--amber-l:#faecd8;
+  --verde:#3B6D11;--verde-l:#e2f0d4;
+  --rojo:#A32D2D;--rojo-l:#fce6e6;
+  --coral:#993C1D;--coral-l:#fae8e0;
+  --shadow:0 2px 14px rgba(0,0,0,.07);
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#17160f;--surface:#222018;--surface2:#2a2821;
+    --border:rgba(255,255,255,.09);--border2:rgba(255,255,255,.18);
+    --text:#e8e4dc;--text2:#a8a49c;--text3:#68645e;
+    --azul:#4a92d6;--azul-l:#0c2e52;--azul-d:#78b4e8;
+    --teal:#2eaa88;--teal-l:#083d2e;
+    --amber:#e89a30;--amber-l:#3d2800;
+    --verde:#68b030;--verde-l:#1a3306;
+    --rojo:#d45a5a;--rojo-l:#3d1010;
+    --coral:#d46040;--coral-l:#3d1a08;
+    --shadow:0 2px 18px rgba(0,0,0,.45);
+  }
+}
+html{scroll-behavior:smooth}
+body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6}
+
+/* HERO */
+.hero{background:linear-gradient(135deg,#0C447C 0%,#185FA5 60%,#1a7fc1 100%);color:#fff;padding:2.5rem 1.5rem 2rem;text-align:center;position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:32px;background:var(--bg);clip-path:ellipse(55% 100% at 50% 100%)}
+.hero-icon{font-size:2.8rem;margin-bottom:.5rem;filter:drop-shadow(0 2px 8px rgba(0,0,0,.25))}
+.hero h1{font-size:clamp(1.5rem,4vw,2.1rem);font-weight:700;letter-spacing:-.02em;margin-bottom:.4rem}
+.hero p{font-size:1rem;opacity:.88;max-width:480px;margin:0 auto 1.3rem}
+.hero-badges{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+.hero-badge{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.32);color:#fff;font-size:12px;padding:4px 14px;border-radius:20px;font-weight:500}
+
+/* STICKY */
+.sticky{position:sticky;top:0;z-index:100;background:var(--surface);border-bottom:1px solid var(--border);padding:.65rem 1.2rem;display:flex;align-items:center;gap:14px;box-shadow:var(--shadow)}
+.prog-label{font-size:12px;color:var(--text3);white-space:nowrap}
+.prog-track{flex:1;height:7px;background:var(--border);border-radius:4px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--azul),#1a7fc1);border-radius:4px;transition:width .4s ease}
+.prog-score{font-size:13px;font-weight:700;color:var(--text);white-space:nowrap;min-width:52px;text-align:right}
+
+/* NAV */
+.nav-wrap{max-width:740px;margin:0 auto;padding:1.1rem 1.2rem .4rem}
+.nav-label{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px}
+.nav-pills{display:flex;gap:7px;flex-wrap:wrap}
+.pill{width:36px;height:36px;border-radius:50%;border:2px solid var(--border2);background:var(--surface);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.pill:hover{border-color:var(--azul);color:var(--azul)}
+.pill.act{background:var(--azul);border-color:var(--azul);color:#fff;box-shadow:0 0 0 3px rgba(24,95,165,.2)}
+.pill.ok{background:var(--verde);border-color:var(--verde);color:#fff}
+.pill.fail{background:var(--rojo);border-color:var(--rojo);color:#fff}
+
+/* CARD */
+.main{max-width:740px;margin:0 auto;padding:1rem 1.2rem 4rem}
+.qcard{background:var(--surface);border-radius:18px;border:1px solid var(--border);box-shadow:var(--shadow);overflow:hidden;animation:fadeUp .28s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.qhead{background:var(--surface2);border-bottom:1px solid var(--border);padding:.9rem 1.3rem;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.qnum{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;font-weight:600}
+.badges{display:flex;gap:6px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:700;padding:3px 11px;border-radius:20px;letter-spacing:.02em}
+.b-mru{background:var(--azul-l);color:var(--azul-d)}
+.b-mrua{background:var(--teal-l);color:var(--teal)}
+.b-pos{background:#e8f0fb;color:#1a4a8a}
+.b-vel{background:#ece8fb;color:#3a2a8a}
+.b-baja{background:var(--verde-l);color:var(--verde)}
+.b-media{background:var(--amber-l);color:var(--amber)}
+.b-alta{background:var(--coral-l);color:var(--coral)}
+
+.qbody{padding:1.3rem 1.3rem 1rem}
+.qtxt{font-size:1rem;line-height:1.75;margin-bottom:1.1rem;color:var(--text)}
+.svgwrap{border:1px solid var(--border);border-radius:12px;margin-bottom:1.1rem;background:var(--surface2);overflow:hidden}
+.svgwrap svg{display:block;width:100%}
+.hint{font-size:12px;color:var(--text3);padding:7px 13px;background:var(--surface2);border-radius:8px;border-left:3px solid var(--azul);margin-bottom:1.1rem}
+
+/* OPCIONES */
+.opts{display:flex;flex-direction:column;gap:9px}
+.opt{display:flex;align-items:flex-start;gap:11px;padding:11px 14px;border:2px solid var(--border2);border-radius:11px;cursor:pointer;transition:all .15s;background:var(--surface);font-size:.92rem;color:var(--text);text-align:left;width:100%;font-family:inherit;line-height:1.5}
+.opt:hover:not(.dis){border-color:var(--azul);background:var(--azul-l)}
+.oletter{width:26px;height:26px;border-radius:50%;border:2px solid var(--border2);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;color:var(--text2);flex-shrink:0;margin-top:1px;transition:all .15s;background:var(--surface2)}
+.opt.sel{border-color:var(--azul);background:var(--azul-l)}
+.opt.sel .oletter{background:var(--azul);color:#fff;border-color:var(--azul)}
+.opt.cor{border-color:var(--verde);background:var(--verde-l)}
+.opt.cor .oletter{background:var(--verde);color:#fff;border-color:var(--verde)}
+.opt.wrg{border-color:var(--rojo);background:var(--rojo-l)}
+.opt.wrg .oletter{background:var(--rojo);color:#fff;border-color:var(--rojo)}
+.opt.dis{cursor:default}
+.opt.dis:hover:not(.cor):not(.wrg){border-color:var(--border2);background:var(--surface)}
+
+/* FEEDBACK */
+.fb{margin-top:1rem;padding:13px 16px;border-radius:11px;font-size:.9rem;line-height:1.7;display:none;animation:fadeUp .2s ease}
+.fb.show{display:block}
+.fb.ok{background:var(--verde-l);border:1.5px solid var(--verde)}
+.fb.fail{background:var(--rojo-l);border:1.5px solid var(--rojo)}
+.fbtitle{font-weight:700;font-size:1rem;margin-bottom:5px}
+.fb.ok .fbtitle{color:var(--verde)}
+.fb.fail .fbtitle{color:var(--rojo)}
+
+/* FOOTER */
+.qfoot{border-top:1px solid var(--border);padding:.9rem 1.3rem;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.btn{padding:9px 22px;border-radius:9px;border:2px solid var(--border2);background:var(--surface);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;transition:all .15s;font-family:inherit}
+.btn:hover{background:var(--surface2)}
+.btnp{background:var(--azul);border-color:var(--azul);color:#fff}
+.btnp:hover{background:var(--azul-d)}
+
+/* RESULTADOS */
+.results{display:none;max-width:740px;margin:0 auto;padding:1rem 1.2rem 4rem}
+.results.on{display:block}
+.rcrd{background:var(--surface);border-radius:18px;border:1px solid var(--border);box-shadow:var(--shadow);text-align:center;padding:2.5rem 2rem 2rem;margin-bottom:1.3rem;animation:fadeUp .3s ease}
+.remoji{font-size:3.5rem;margin-bottom:.8rem}
+.rtitle{font-size:1.7rem;font-weight:700;margin-bottom:.4rem}
+.rsub{color:var(--text2);margin-bottom:1.5rem;font-size:.95rem}
+.rbig{font-size:3.2rem;font-weight:800;color:var(--azul);line-height:1}
+.rbiglbl{font-size:13px;color:var(--text3);margin:.4rem 0 1.5rem}
+.rgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1.5rem}
+.rstat{background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:1rem}
+.rstat-val{font-size:2rem;font-weight:800}
+.rstat-lbl{font-size:12px;color:var(--text3);margin-top:2px}
+.rstat.g .rstat-val{color:var(--verde)}
+.rstat.r .rstat-val{color:var(--rojo)}
+.revh{font-size:15px;font-weight:700;color:var(--text2);margin-bottom:10px}
+.revlist{display:flex;flex-direction:column;gap:9px}
+.revitem{background:var(--surface);border:1.5px solid var(--border);border-radius:11px;padding:11px 14px;display:flex;align-items:center;gap:11px;font-size:13px}
+.revitem.ok{border-color:var(--verde);background:var(--verde-l)}
+.revitem.fail{border-color:var(--rojo);background:var(--rojo-l)}
+.revnum{font-weight:700;color:var(--text2);min-width:24px}
+.revicon{font-size:16px;flex-shrink:0}
+.revtxt{flex:1;color:var(--text2);font-size:12px;line-height:1.4}
+.btnrev{padding:5px 12px;font-size:12px;border-radius:7px;border:1.5px solid var(--border2);background:var(--surface);color:var(--text);cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;white-space:nowrap}
+.btnrev:hover{background:var(--surface2)}
+@media(max-width:480px){.qbody,.qhead,.qfoot{padding:.9rem 1rem}.hero{padding:2rem 1rem 1.5rem}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-icon">⚡</div>
+  <h1>Taller de Cinemática</h1>
+  <p>Análisis gráfico de MRU y MRUA · Grado 10°</p>
+  <div class="hero-badges">
+    <span class="hero-badge">10 preguntas</span>
+    <span class="hero-badge">Gráficas verificadas</span>
+    <span class="hero-badge">Retroalimentación inmediata</span>
+  </div>
+</div>
+
+<div class="sticky">
+  <span class="prog-label">Progreso</span>
+  <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+  <span class="prog-score" id="ps">0 / 0</span>
+</div>
+
+<div class="nav-wrap">
+  <div class="nav-label">Ir a pregunta</div>
+  <div class="nav-pills" id="nav"></div>
+</div>
+
+<div class="main" id="qmain"><div class="qcard" id="qcard"></div></div>
+<div class="results" id="rpanel"></div>
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATOS DE PREGUNTAS — GRÁFICAS MATEMÁTICAMENTE VERIFICADAS
+   Cada SVG usa coordenadas calculadas con Python
+   ═══════════════════════════════════════════════ */
+const QS = [
+
+/* ──────────── P1: MRU posición-tiempo ────────────
+   x(t) = (40/6)t ≈ 6.67 m/s   (velocidad constante)
+   Escala: t→px = 50+t*52,  x→y = 195 - x*3.3
+   Puntos verificados:
+     t=0→(50,195)  t=3→(206,129)  t=6→(362,63)
+   Marcas y: 10m→y=162  20m→y=129  30m→y=96  40m→y=63
+──────────────────────────────────────────────────── */
+{tipo:"MRU",graf:"Posición-tiempo",dif:"Baja",
+txt:"La gráfica muestra la posición de una bicicleta en función del tiempo. ¿Cuál de las siguientes afirmaciones describe mejor el movimiento de la bicicleta?",
+svg:`<svg viewBox="0 0 430 225" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <!-- Ejes -->
+  <line x1="50" y1="195" x2="410" y2="195" stroke="#888" stroke-width="1.3" marker-end="url(#ah)"/>
+  <line x1="50" y1="195" x2="50"  y2="18"  stroke="#888" stroke-width="1.3" marker-end="url(#ah)"/>
+  <text x="413" y="199" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="18"  font-size="12" fill="#888" font-family="sans-serif">x (m)</text>
+  <!-- Marcas eje t: 1-6 s  (px = 50+t*52) -->
+  <line x1="102" y1="192" x2="102" y2="198" stroke="#888" stroke-width="1"/><text x="102" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="154" y1="192" x2="154" y2="198" stroke="#888" stroke-width="1"/><text x="154" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="206" y1="192" x2="206" y2="198" stroke="#888" stroke-width="1"/><text x="206" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="258" y1="192" x2="258" y2="198" stroke="#888" stroke-width="1"/><text x="258" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="310" y1="192" x2="310" y2="198" stroke="#888" stroke-width="1"/><text x="310" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <line x1="362" y1="192" x2="362" y2="198" stroke="#888" stroke-width="1"/><text x="362" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">6</text>
+  <!-- Marcas eje x: 10,20,30,40 m  (y = 195 - x*3.3) -->
+  <line x1="47" y1="162" x2="53" y2="162" stroke="#888" stroke-width="1"/><text x="44" y="166" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">10</text>
+  <line x1="47" y1="129" x2="53" y2="129" stroke="#888" stroke-width="1"/><text x="44" y="133" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">20</text>
+  <line x1="47" y1="96"  x2="53" y2="96"  stroke="#888" stroke-width="1"/><text x="44" y="100" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">30</text>
+  <line x1="47" y1="63"  x2="53" y2="63"  stroke="#888" stroke-width="1"/><text x="44" y="67"  font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">40</text>
+  <!-- Recta MRU: (50,195)→(362,63) -->
+  <line x1="50" y1="195" x2="362" y2="63" stroke="#185FA5" stroke-width="2.8" stroke-linecap="round"/>
+  <circle cx="50"  cy="195" r="4.5" fill="#185FA5"/>
+  <circle cx="362" cy="63"  r="4.5" fill="#185FA5"/>
+  <text x="368" y="61" font-size="11" fill="#185FA5" font-family="sans-serif" font-weight="600">(6 s, 40 m)</text>
+</svg>`,
+opts:["La bicicleta está frenando progresivamente porque la línea sube hacia arriba.",
+      "La bicicleta se mueve con velocidad constante porque la gráfica es una línea recta con pendiente positiva.",
+      "La bicicleta acelera porque la posición aumenta con el tiempo.",
+      "La bicicleta está en reposo porque no cambia de dirección."],
+cor:1,
+just:"En una gráfica posición-tiempo, una <strong>línea recta</strong> indica velocidad constante (MRU). La pendiente es la velocidad: <em>v = Δx/Δt = 40 m / 6 s ≈ 6,7 m/s</em>. Que la posición aumente no implica aceleración; la aceleración aparece como una curva, no como una recta."},
+
+/* ──────────── P2: MRU velocidad-tiempo ────────────
+   v = 5 m/s (constante). t=[0,8 s]
+   Escala: t→px = 50+t*40,  v→y = 195 - v*16
+   Marca v=5: y=115.  Área = 8×5 = 40 m
+──────────────────────────────────────────────────── */
+{tipo:"MRU",graf:"Velocidad-tiempo",dif:"Baja",
+txt:"La gráfica muestra la velocidad de un patinador durante 8 segundos. ¿Qué distancia total recorrió el patinador en ese intervalo?",
+svg:`<svg viewBox="0 0 430 225" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah2" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="50" y1="195" x2="410" y2="195" stroke="#888" stroke-width="1.3" marker-end="url(#ah2)"/>
+  <line x1="50" y1="195" x2="50"  y2="18"  stroke="#888" stroke-width="1.3" marker-end="url(#ah2)"/>
+  <text x="413" y="199" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="18"  font-size="12" fill="#888" font-family="sans-serif">v (m/s)</text>
+  <!-- Marcas t: 1-8 s  (px = 50+t*40) -->
+  <line x1="90"  y1="192" x2="90"  y2="198" stroke="#888" stroke-width="1"/><text x="90"  y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="130" y1="192" x2="130" y2="198" stroke="#888" stroke-width="1"/><text x="130" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="170" y1="192" x2="170" y2="198" stroke="#888" stroke-width="1"/><text x="170" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="210" y1="192" x2="210" y2="198" stroke="#888" stroke-width="1"/><text x="210" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="250" y1="192" x2="250" y2="198" stroke="#888" stroke-width="1"/><text x="250" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <line x1="290" y1="192" x2="290" y2="198" stroke="#888" stroke-width="1"/><text x="290" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">6</text>
+  <line x1="330" y1="192" x2="330" y2="198" stroke="#888" stroke-width="1"/><text x="330" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">7</text>
+  <line x1="370" y1="192" x2="370" y2="198" stroke="#888" stroke-width="1"/><text x="370" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">8</text>
+  <!-- Marca v=5: y=115 -->
+  <line x1="47" y1="115" x2="53" y2="115" stroke="#888" stroke-width="1"/><text x="44" y="119" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">5</text>
+  <!-- Área bajo la curva -->
+  <rect x="50" y="115" width="320" height="80" fill="#185FA5" opacity="0.11"/>
+  <!-- Línea horizontal v=5 -->
+  <line x1="50" y1="115" x2="370" y2="115" stroke="#185FA5" stroke-width="2.8" stroke-linecap="round"/>
+  <circle cx="50"  cy="115" r="4.5" fill="#185FA5"/>
+  <circle cx="370" cy="115" r="4.5" fill="#185FA5"/>
+  <!-- Etiqueta área -->
+  <text x="210" y="162" font-size="12" fill="#185FA5" font-family="sans-serif" text-anchor="middle" font-weight="600">Área = distancia recorrida</text>
+</svg>`,
+opts:["5 m, porque la velocidad es 5 m/s en todo momento.",
+      "13 m, porque se divide la velocidad entre el tiempo.",
+      "40 m, porque el área bajo la gráfica velocidad-tiempo representa la distancia recorrida.",
+      "8 m, porque el tiempo total es 8 s y esa es la lectura del eje."],
+cor:2,
+just:"En una gráfica velocidad-tiempo, el <strong>área bajo la curva</strong> representa la distancia recorrida. El área es un rectángulo: Área = base × altura = 8 s × 5 m/s = <strong>40 m</strong>. Las demás opciones leen directamente un valor del eje en lugar de calcular el área."},
+
+/* ──────────── P3: MRUA velocidad-tiempo ────────────
+   v(t) = 5t m/s  →  a = 5 m/s².  t=[0,6 s], v=[0,30 m/s]
+   Escala: t→px = 50+t*52,  v→y = 195 - v*3.3
+   Puntos: (50,195),(154,162),(258,129),(362,96)
+   Marcas v: 10→y=162  20→y=129  30→y=96
+   Triángulo auxiliar: t=2→t=6 (Δt=4s), Δv=20 → a=5 m/s²
+──────────────────────────────────────────────────── */
+{tipo:"MRUA",graf:"Velocidad-tiempo",dif:"Baja",
+txt:"Un automóvil arranca desde el reposo y acelera uniformemente. La gráfica muestra cómo cambia su velocidad. ¿Cuánto vale la aceleración del automóvil?",
+svg:`<svg viewBox="0 0 430 225" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah3" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="50" y1="195" x2="410" y2="195" stroke="#888" stroke-width="1.3" marker-end="url(#ah3)"/>
+  <line x1="50" y1="195" x2="50"  y2="18"  stroke="#888" stroke-width="1.3" marker-end="url(#ah3)"/>
+  <text x="413" y="199" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="18"  font-size="12" fill="#888" font-family="sans-serif">v (m/s)</text>
+  <!-- Marcas t: 1-6 s -->
+  <line x1="102" y1="192" x2="102" y2="198" stroke="#888" stroke-width="1"/><text x="102" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="154" y1="192" x2="154" y2="198" stroke="#888" stroke-width="1"/><text x="154" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="206" y1="192" x2="206" y2="198" stroke="#888" stroke-width="1"/><text x="206" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="258" y1="192" x2="258" y2="198" stroke="#888" stroke-width="1"/><text x="258" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="310" y1="192" x2="310" y2="198" stroke="#888" stroke-width="1"/><text x="310" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <line x1="362" y1="192" x2="362" y2="198" stroke="#888" stroke-width="1"/><text x="362" y="210" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">6</text>
+  <!-- Marcas v: 10,20,30 m/s -->
+  <line x1="47" y1="162" x2="53" y2="162" stroke="#888" stroke-width="1"/><text x="44" y="166" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">10</text>
+  <line x1="47" y1="129" x2="53" y2="129" stroke="#888" stroke-width="1"/><text x="44" y="133" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">20</text>
+  <line x1="47" y1="96"  x2="53" y2="96"  stroke="#888" stroke-width="1"/><text x="44" y="100" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">30</text>
+  <!-- Recta MRUA: (50,195)→(362,96) -->
+  <line x1="50" y1="195" x2="362" y2="96" stroke="#0F6E56" stroke-width="2.8" stroke-linecap="round"/>
+  <circle cx="50"  cy="195" r="4.5" fill="#0F6E56"/>
+  <circle cx="362" cy="96"  r="4.5" fill="#0F6E56"/>
+  <text x="368" y="94" font-size="11" fill="#0F6E56" font-family="sans-serif" font-weight="600">(6 s, 30 m/s)</text>
+  <!-- Triángulo auxiliar: t=2(px=154,v=10,y=162) → t=6(px=362,v=30,y=96) -->
+  <line x1="154" y1="162" x2="362" y2="162" stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.65"/>
+  <line x1="362" y1="162" x2="362" y2="96"  stroke="#0F6E56" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.65"/>
+  <text x="252" y="175" font-size="11" fill="#0F6E56" font-family="sans-serif" text-anchor="middle">Δt = 4 s</text>
+  <text x="388" y="133" font-size="11" fill="#0F6E56" font-family="sans-serif">Δv = 20 m/s</text>
+</svg>`,
+opts:["30 m/s², porque esa es la velocidad máxima que aparece en la gráfica.",
+      "5 m/s², porque la pendiente de la recta es Δv/Δt = 30 m/s ÷ 6 s.",
+      "180 m, porque el área bajo la curva determina la aceleración.",
+      "6 m/s², porque hay 6 segundos marcados en el eje del tiempo."],
+cor:1,
+just:"En una gráfica velocidad-tiempo, la <strong>pendiente de la recta</strong> representa la aceleración: <em>a = Δv/Δt = 30 m/s ÷ 6 s = 5 m/s²</em>. El área bajo la curva es la distancia recorrida, no la aceleración. La velocidad máxima (30 m/s) es una cantidad distinta."},
+
+/* ──────────── P4: MRU dos corredores ────────────
+   Andrés: x_A = 10t  (parte de x=0)
+   Beatriz: x_B = 60−10t  (parte de x=60)
+   Encuentro: t=3 s, x=30 m
+   MISMA ESCALA: t→px=50+t*50, x→y=215-x*3.3
+   Andrés:  (50,215)→(350,17)
+   Beatriz: (50,17)→(350,215)   ← CORRECCIÓN: antes y=50, ahora y=17
+   Cruce:   (200,116)
+   Marcas y: 10→182  20→149  30→116  40→83  50→50  60→17
+──────────────────────────────────────────────────── */
+{tipo:"MRU",graf:"Posición-tiempo",dif:"Media",
+txt:"Dos corredores, Andrés (azul) y Beatriz (naranja), salen al mismo tiempo desde posiciones diferentes. ¿En qué instante se encuentran y a qué posición?",
+svg:`<svg viewBox="0 0 430 240" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah4" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="50" y1="215" x2="410" y2="215" stroke="#888" stroke-width="1.3" marker-end="url(#ah4)"/>
+  <line x1="50" y1="215" x2="50"  y2="20"  stroke="#888" stroke-width="1.3" marker-end="url(#ah4)"/>
+  <text x="413" y="219" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="20"  font-size="12" fill="#888" font-family="sans-serif">x (m)</text>
+  <!-- Marcas t: 1-6 s  (px=50+t*50) -->
+  <line x1="100" y1="212" x2="100" y2="218" stroke="#888" stroke-width="1"/><text x="100" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="150" y1="212" x2="150" y2="218" stroke="#888" stroke-width="1"/><text x="150" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="200" y1="212" x2="200" y2="218" stroke="#888" stroke-width="1"/><text x="200" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="250" y1="212" x2="250" y2="218" stroke="#888" stroke-width="1"/><text x="250" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="300" y1="212" x2="300" y2="218" stroke="#888" stroke-width="1"/><text x="300" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <line x1="350" y1="212" x2="350" y2="218" stroke="#888" stroke-width="1"/><text x="350" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">6</text>
+  <!-- Marcas x: 10→182 20→149 30→116 40→83 50→50 60→17  (y=215-x*3.3) -->
+  <line x1="47" y1="182" x2="53" y2="182" stroke="#888" stroke-width="1"/><text x="44" y="186" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">10</text>
+  <line x1="47" y1="149" x2="53" y2="149" stroke="#888" stroke-width="1"/><text x="44" y="153" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">20</text>
+  <line x1="47" y1="116" x2="53" y2="116" stroke="#888" stroke-width="1"/><text x="44" y="120" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">30</text>
+  <line x1="47" y1="83"  x2="53" y2="83"  stroke="#888" stroke-width="1"/><text x="44" y="87"  font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">40</text>
+  <line x1="47" y1="50"  x2="53" y2="50"  stroke="#888" stroke-width="1"/><text x="44" y="54"  font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">50</text>
+  <line x1="47" y1="17"  x2="53" y2="17"  stroke="#888" stroke-width="1"/><text x="44" y="21"  font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">60</text>
+  <!-- Andrés: x=10t → (50,215)→(350,17) -->
+  <line x1="50" y1="215" x2="350" y2="17" stroke="#185FA5" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Beatriz: x=60-10t → t=0,x=60→(50,17); t=6,x=0→(350,215) -->
+  <line x1="50" y1="17" x2="350" y2="215" stroke="#BA7517" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Intersección t=3, x=30 → (200,116) -->
+  <circle cx="200" cy="116" r="6" fill="#A32D2D"/>
+  <line x1="200" y1="116" x2="200" y2="215" stroke="#A32D2D" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.65"/>
+  <line x1="50"  y1="116" x2="200" y2="116" stroke="#A32D2D" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.65"/>
+  <text x="208" y="113" font-size="11" fill="#A32D2D" font-family="sans-serif" font-weight="700">(3 s, 30 m)</text>
+  <!-- Leyenda -->
+  <rect x="268" y="48" width="100" height="46" rx="7" fill="white" fill-opacity="0.85" stroke="#ccc" stroke-width="0.8"/>
+  <line x1="276" y1="64" x2="294" y2="64" stroke="#185FA5" stroke-width="2.5"/><circle cx="285" cy="64" r="3" fill="#185FA5"/>
+  <text x="298" y="68" font-size="11" fill="#444" font-family="sans-serif">Andrés</text>
+  <line x1="276" y1="80" x2="294" y2="80" stroke="#BA7517" stroke-width="2.5"/>
+  <text x="298" y="84" font-size="11" fill="#444" font-family="sans-serif">Beatriz</text>
+</svg>`,
+opts:["Se encuentran en t = 6 s y en x = 60 m, cuando Andrés llega al final del recorrido.",
+      "Nunca se encuentran porque avanzan en la misma dirección.",
+      "Se encuentran en t = 3 s y en x = 30 m, que es el punto de intersección de las dos rectas.",
+      "Se encuentran en t = 0 s porque el cronómetro arranca al mismo tiempo para los dos."],
+cor:2,
+just:"El encuentro ocurre cuando ambos están en la misma posición al mismo tiempo, es decir, en el <strong>punto de intersección</strong> de las dos rectas. Andrés: x = 10 × 3 = 30 m. Beatriz: x = 60 − 10 × 3 = 30 m. ✓ Se encuentran en <strong>t = 3 s y x = 30 m</strong>."},
+
+/* ──────────── P5: MRUA posición-tiempo (pelota) ────────────
+   x(t) = 2.5t² (t=0..4 s), luego reposo (x=40 m, t=4..8 s)
+   Escala: t→px=50+t*40,  x→y=215-x*4
+   Puntos parábola: (50,215),(90,205),(130,175),(170,125),(210,55)
+   Luego horizontal: (210,55)→(370,55)
+──────────────────────────────────────────────────── */
+{tipo:"MRUA",graf:"Posición-tiempo",dif:"Media",
+txt:"La gráfica muestra la posición de una pelota de fútbol que rueda y luego se detiene. ¿Qué describe correctamente el movimiento durante el tramo curvo (t = 0 a t = 4 s)?",
+svg:`<svg viewBox="0 0 430 240" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah5" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="50" y1="215" x2="410" y2="215" stroke="#888" stroke-width="1.3" marker-end="url(#ah5)"/>
+  <line x1="50" y1="215" x2="50"  y2="20"  stroke="#888" stroke-width="1.3" marker-end="url(#ah5)"/>
+  <text x="413" y="219" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="20"  font-size="12" fill="#888" font-family="sans-serif">x (m)</text>
+  <!-- Marcas t: 1-8 s  (px=50+t*40) -->
+  <line x1="90"  y1="212" x2="90"  y2="218" stroke="#888" stroke-width="1"/><text x="90"  y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="130" y1="212" x2="130" y2="218" stroke="#888" stroke-width="1"/><text x="130" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="170" y1="212" x2="170" y2="218" stroke="#888" stroke-width="1"/><text x="170" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="210" y1="212" x2="210" y2="218" stroke="#888" stroke-width="1"/><text x="210" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="250" y1="212" x2="250" y2="218" stroke="#888" stroke-width="1"/><text x="250" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <line x1="290" y1="212" x2="290" y2="218" stroke="#888" stroke-width="1"/><text x="290" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">6</text>
+  <line x1="330" y1="212" x2="330" y2="218" stroke="#888" stroke-width="1"/><text x="330" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">7</text>
+  <line x1="370" y1="212" x2="370" y2="218" stroke="#888" stroke-width="1"/><text x="370" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">8</text>
+  <!-- Marca x=40 m: y=55 -->
+  <line x1="47" y1="55" x2="53" y2="55" stroke="#888" stroke-width="1"/><text x="44" y="59" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">40</text>
+  <!-- Parábola x=2.5t², usando puntos exactos:
+       t=0→(50,215) t=1→(90,205) t=2→(130,175) t=3→(170,125) t=4→(210,55) -->
+  <polyline points="50,215 90,205 130,175 170,125 210,55"
+    fill="none" stroke="#0F6E56" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Horizontal t=4..8 en y=55 -->
+  <line x1="210" y1="55" x2="370" y2="55" stroke="#0F6E56" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Punto de transición -->
+  <circle cx="210" cy="55" r="5" fill="#0F6E56"/>
+  <text x="218" y="51" font-size="11" fill="#0F6E56" font-family="sans-serif" font-weight="600">(4 s, 40 m)</text>
+  <!-- Etiquetas -->
+  <text x="118" y="168" font-size="12" fill="#0F6E56" font-family="sans-serif" font-weight="700" text-anchor="middle">MRUA</text>
+  <text x="298" y="44" font-size="12" fill="#0F6E56" font-family="sans-serif" font-weight="700" text-anchor="middle">Reposo</text>
+</svg>`,
+opts:["La pelota se mueve con velocidad constante porque su posición sigue aumentando.",
+      "La pelota está en reposo durante la curva porque la línea no es horizontal.",
+      "La pelota acelera uniformemente: la curva parabólica indica que su velocidad va aumentando con el tiempo.",
+      "La pelota está frenando durante todo el recorrido curvo."],
+cor:2,
+just:"En una gráfica posición-tiempo, una <strong>parábola</strong> indica aceleración uniforme (MRUA). La pendiente de la curva —que representa la velocidad— crece progresivamente, señal de aceleración. La línea horizontal posterior indica <strong>reposo</strong> (velocidad = 0, posición constante en x = 40 m)."},
+
+/* ──────────── P6: MRUA ciclista — velocidades positivas y negativas ────────────
+   t=0..4: v 20→0 (sube cuesta). t=4..8: v 0→-20 (baja cuesta)
+   Eje v=0 en y=130. v=20→y=80, v=-20→y=180
+   Escala: t→px=50+t*40,  v→y=130-v*2.5
+   Puntos: (50,80)→(210,130)→(370,180)
+──────────────────────────────────────────────────── */
+{tipo:"MRUA",graf:"Velocidad-tiempo",dif:"Media",
+txt:"Un ciclista sube una cuesta y luego baja la otra ladera. ¿Qué ocurre físicamente con el ciclista entre t = 4 s y t = 8 s?",
+svg:`<svg viewBox="0 0 430 245" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah6" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <!-- Eje t -->
+  <line x1="50" y1="130" x2="410" y2="130" stroke="#888" stroke-width="1.3" marker-end="url(#ah6)"/>
+  <!-- Eje v -->
+  <line x1="50" y1="225" x2="50" y2="22" stroke="#888" stroke-width="1.3" marker-end="url(#ah6)"/>
+  <text x="413" y="134" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="22"  font-size="12" fill="#888" font-family="sans-serif">v (m/s)</text>
+  <!-- Marcas t: 1-8 -->
+  <line x1="90"  y1="127" x2="90"  y2="133" stroke="#888" stroke-width="1"/><text x="90"  y="145" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="130" y1="127" x2="130" y2="133" stroke="#888" stroke-width="1"/><text x="130" y="145" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="170" y1="127" x2="170" y2="133" stroke="#888" stroke-width="1"/><text x="170" y="145" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="210" y1="127" x2="210" y2="133" stroke="#888" stroke-width="1"/><text x="210" y="145" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="250" y1="127" x2="250" y2="133" stroke="#888" stroke-width="1"/><text x="250" y="145" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <line x1="290" y1="127" x2="290" y2="133" stroke="#888" stroke-width="1"/><text x="290" y="145" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">6</text>
+  <line x1="330" y1="127" x2="330" y2="133" stroke="#888" stroke-width="1"/><text x="330" y="145" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">7</text>
+  <line x1="370" y1="127" x2="370" y2="133" stroke="#888" stroke-width="1"/><text x="370" y="145" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">8</text>
+  <!-- Marcas v: +20 y -20  (y=130-v*2.5) -->
+  <line x1="47" y1="80"  x2="53" y2="80"  stroke="#888" stroke-width="1"/><text x="44" y="84"  font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">20</text>
+  <line x1="47" y1="180" x2="53" y2="180" stroke="#888" stroke-width="1"/><text x="44" y="184" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">−20</text>
+  <!-- Tramo 1: t=0..4, v de 20→0: (50,80)→(210,130) -->
+  <line x1="50" y1="80" x2="210" y2="130" stroke="#185FA5" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Tramo 2: t=4..8, v de 0→-20: (210,130)→(370,180) -->
+  <line x1="210" y1="130" x2="370" y2="180" stroke="#BA7517" stroke-width="2.8" stroke-linecap="round"/>
+  <!-- Sombreado tramo 2 -->
+  <polygon points="210,130 370,130 370,180 210,130" fill="#BA7517" opacity="0.09"/>
+  <!-- Etiquetas -->
+  <text x="128" y="96"  font-size="12" fill="#185FA5" font-family="sans-serif" text-anchor="middle" font-weight="700">Sube la cuesta</text>
+  <text x="295" y="170" font-size="12" fill="#BA7517" font-family="sans-serif" text-anchor="middle" font-weight="700">Baja la cuesta</text>
+  <!-- Punto cima -->
+  <circle cx="210" cy="130" r="5" fill="#A32D2D"/>
+  <text x="218" y="125" font-size="11" fill="#A32D2D" font-family="sans-serif" font-weight="700">v = 0 (cima)</text>
+</svg>`,
+opts:["El ciclista está en reposo porque su velocidad era cero en t = 4 s.",
+      "El ciclista se mueve en sentido contrario y acelera cuesta abajo (la magnitud de su velocidad aumenta).",
+      "El ciclista frena continuamente hasta detenerse definitivamente en t = 8 s.",
+      "La velocidad negativa indica que el ciclista retrocede en el tiempo."],
+cor:1,
+just:"Entre t = 4 s y t = 8 s la velocidad pasa de 0 a −20 m/s. El <strong>signo negativo</strong> indica movimiento en sentido opuesto (bajada). La magnitud aumenta de 0 a 20 m/s: el ciclista <strong>acelera cuesta abajo</strong>. No está frenando ni en reposo; está ganando velocidad en sentido contrario."},
+
+/* ──────────── P7: MRU tres vehículos ────────────
+   A:v=12 m/s, B:v=8 m/s, C:v=4 m/s. t=[0,5 s], x=[0,60 m]
+   Escala: t→px=50+t*60,  x→y=215-x*2.4
+   A: (50,215)→(350,71)   B: (50,215)→(350,119)   C: (50,215)→(350,167)
+   Marcas x: 20→y=167  40→y=119  60→y=71
+──────────────────────────────────────────────────── */
+{tipo:"MRU",graf:"Posición-tiempo",dif:"Media",
+txt:"La gráfica muestra el movimiento de tres vehículos: A, B y C, que parten del mismo punto y al mismo tiempo. ¿Cuál tiene la mayor velocidad?",
+svg:`<svg viewBox="0 0 430 240" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah7" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="50" y1="215" x2="410" y2="215" stroke="#888" stroke-width="1.3" marker-end="url(#ah7)"/>
+  <line x1="50" y1="215" x2="50"  y2="20"  stroke="#888" stroke-width="1.3" marker-end="url(#ah7)"/>
+  <text x="413" y="219" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="20"  font-size="12" fill="#888" font-family="sans-serif">x (m)</text>
+  <!-- Marcas t: 1-5 s  (px=50+t*60) -->
+  <line x1="110" y1="212" x2="110" y2="218" stroke="#888" stroke-width="1"/><text x="110" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="170" y1="212" x2="170" y2="218" stroke="#888" stroke-width="1"/><text x="170" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="230" y1="212" x2="230" y2="218" stroke="#888" stroke-width="1"/><text x="230" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="290" y1="212" x2="290" y2="218" stroke="#888" stroke-width="1"/><text x="290" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="350" y1="212" x2="350" y2="218" stroke="#888" stroke-width="1"/><text x="350" y="229" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <!-- Marcas x: 20→167  40→119  60→71  (y=215-x*2.4) -->
+  <line x1="47" y1="167" x2="53" y2="167" stroke="#888" stroke-width="1"/><text x="44" y="171" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">20</text>
+  <line x1="47" y1="119" x2="53" y2="119" stroke="#888" stroke-width="1"/><text x="44" y="123" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">40</text>
+  <line x1="47" y1="71"  x2="53" y2="71"  stroke="#888" stroke-width="1"/><text x="44" y="75"  font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">60</text>
+  <!-- A: v=12 → (50,215)→(350,71) -->
+  <line x1="50" y1="215" x2="350" y2="71" stroke="#185FA5" stroke-width="2.8" stroke-linecap="round"/>
+  <text x="354" y="69" font-size="14" fill="#185FA5" font-family="sans-serif" font-weight="800">A</text>
+  <!-- B: v=8 → (50,215)→(350,119) -->
+  <line x1="50" y1="215" x2="350" y2="119" stroke="#0F6E56" stroke-width="2.8" stroke-linecap="round"/>
+  <text x="354" y="117" font-size="14" fill="#0F6E56" font-family="sans-serif" font-weight="800">B</text>
+  <!-- C: v=4 → (50,215)→(350,167) -->
+  <line x1="50" y1="215" x2="350" y2="167" stroke="#BA7517" stroke-width="2.8" stroke-linecap="round"/>
+  <text x="354" y="165" font-size="14" fill="#BA7517" font-family="sans-serif" font-weight="800">C</text>
+  <circle cx="50" cy="215" r="4" fill="#555"/>
+</svg>`,
+opts:["El vehículo C, porque su línea queda más cerca del eje horizontal.",
+      "El vehículo B, porque está entre los otros dos vehículos.",
+      "El vehículo A, porque su recta tiene la pendiente más pronunciada, lo que indica mayor velocidad.",
+      "Todos tienen la misma velocidad porque parten del mismo punto y al mismo tiempo."],
+cor:2,
+just:"En una gráfica posición-tiempo, la <strong>pendiente de la recta es la velocidad</strong>. Cuanto más inclinada, mayor velocidad. A: v = 12 m/s, B: v = 8 m/s, C: v = 4 m/s. El vehículo <strong>A</strong> tiene la pendiente más empinada, por lo tanto la mayor velocidad."},
+
+/* ──────────── P8: MRUA trapecio (jugador fútbol) ────────────
+   Tramo I: t=0..2, v 0→8 m/s (triángulo)
+   Tramo II: t=2..6, v=8 m/s  (rectángulo)
+   Tramo III: t=6..8, v 8→0   (triángulo)
+   Escala: t→px=50+t*40,  v→y=200-v*15
+   v=8→y=80. Trapecio: (50,200),(130,80),(290,80),(370,200)
+   Distancias: 8+32+8 = 48 m
+──────────────────────────────────────────────────── */
+{tipo:"MRUA",graf:"Velocidad-tiempo",dif:"Alta",
+txt:"Un jugador de fútbol primero acelera uniformemente (tramo I), luego corre a velocidad constante (tramo II) y finalmente frena hasta detenerse (tramo III). ¿Cuál es la distancia total recorrida?",
+svg:`<svg viewBox="0 0 430 225" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah8" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="50" y1="200" x2="410" y2="200" stroke="#888" stroke-width="1.3" marker-end="url(#ah8)"/>
+  <line x1="50" y1="200" x2="50"  y2="22"  stroke="#888" stroke-width="1.3" marker-end="url(#ah8)"/>
+  <text x="413" y="204" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="22"  font-size="12" fill="#888" font-family="sans-serif">v (m/s)</text>
+  <!-- Marcas t: 1-8 s  (px=50+t*40) -->
+  <line x1="90"  y1="197" x2="90"  y2="203" stroke="#888" stroke-width="1"/><text x="90"  y="213" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="130" y1="197" x2="130" y2="203" stroke="#888" stroke-width="1"/><text x="130" y="213" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="170" y1="197" x2="170" y2="203" stroke="#888" stroke-width="1"/><text x="170" y="213" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="210" y1="197" x2="210" y2="203" stroke="#888" stroke-width="1"/><text x="210" y="213" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="250" y1="197" x2="250" y2="203" stroke="#888" stroke-width="1"/><text x="250" y="213" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <line x1="290" y1="197" x2="290" y2="203" stroke="#888" stroke-width="1"/><text x="290" y="213" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">6</text>
+  <line x1="330" y1="197" x2="330" y2="203" stroke="#888" stroke-width="1"/><text x="330" y="213" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">7</text>
+  <line x1="370" y1="197" x2="370" y2="203" stroke="#888" stroke-width="1"/><text x="370" y="213" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">8</text>
+  <!-- Marca v=8 m/s: y=80  (y=200-8*15) -->
+  <line x1="47" y1="80" x2="53" y2="80" stroke="#888" stroke-width="1"/><text x="44" y="84" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">8</text>
+  <!-- Área trapecio sombreada -->
+  <polygon points="50,200 130,80 290,80 370,200" fill="#185FA5" opacity="0.11"/>
+  <!-- Trapecio: (50,200)→(130,80)→(290,80)→(370,200) -->
+  <polyline points="50,200 130,80 290,80 370,200" fill="none" stroke="#185FA5" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Divisores de tramos -->
+  <line x1="130" y1="80" x2="130" y2="200" stroke="#185FA5" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.5"/>
+  <line x1="290" y1="80" x2="290" y2="200" stroke="#185FA5" stroke-width="1.2" stroke-dasharray="5 3" opacity="0.5"/>
+  <!-- Etiquetas de tramos -->
+  <text x="90"  y="152" font-size="13" fill="#185FA5" font-family="sans-serif" text-anchor="middle" font-weight="800">I</text>
+  <text x="210" y="140" font-size="13" fill="#185FA5" font-family="sans-serif" text-anchor="middle" font-weight="800">II</text>
+  <text x="330" y="152" font-size="13" fill="#185FA5" font-family="sans-serif" text-anchor="middle" font-weight="800">III</text>
+  <text x="90"  y="165" font-size="10" fill="#185FA5" font-family="sans-serif" text-anchor="middle">2 s</text>
+  <text x="210" y="153" font-size="10" fill="#185FA5" font-family="sans-serif" text-anchor="middle">4 s</text>
+  <text x="330" y="165" font-size="10" fill="#185FA5" font-family="sans-serif" text-anchor="middle">2 s</text>
+</svg>`,
+opts:["8 m, porque la velocidad máxima es 8 m/s y ese es el dato clave de la gráfica.",
+      "64 m, multiplicando 8 m/s × 8 s (velocidad máxima por tiempo total).",
+      "48 m, sumando las tres áreas: triángulo I (8 m) + rectángulo II (32 m) + triángulo III (8 m).",
+      "32 m, calculando solo el área del tramo de velocidad constante (tramo II)."],
+cor:2,
+just:"La distancia es la suma de todas las áreas bajo la gráfica v-t. <strong>Tramo I</strong> (triángulo): ½ × 2 s × 8 m/s = 8 m. <strong>Tramo II</strong> (rectángulo): 4 s × 8 m/s = 32 m. <strong>Tramo III</strong> (triángulo): ½ × 2 s × 8 m/s = 8 m. <strong>Total = 48 m</strong>. La opción B es el error clásico de multiplicar v_máx × t_total, válido solo si la velocidad fuera constante todo el tiempo."},
+
+/* ──────────── P9: MRUA dos motos ────────────
+   X: v_X=2t (MRUA, a=2 m/s²). Y: v_Y=8 m/s (MRU constante)
+   Escala: t→px=50+t*40,  v→y=210-v*10
+   X: (50,210)→(370,50). Y: v=8→y=130 (constante)
+   Cruce velocidades: t=4, v=8 → (210,130)
+   Igualdad de distancias: t=8 (área_X=½×8×16=64m = área_Y=8×8=64m)
+──────────────────────────────────────────────────── */
+{tipo:"MRUA",graf:"Velocidad-tiempo",dif:"Alta",
+txt:"Dos motos, X (azul) y Y (verde), parten al mismo tiempo desde el mismo punto. ¿En qué instante la distancia recorrida por X iguala a la de Y por primera vez, y cuánto vale la aceleración de X?",
+svg:`<svg viewBox="0 0 430 225" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah9" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="50" y1="210" x2="410" y2="210" stroke="#888" stroke-width="1.3" marker-end="url(#ah9)"/>
+  <line x1="50" y1="210" x2="50"  y2="22"  stroke="#888" stroke-width="1.3" marker-end="url(#ah9)"/>
+  <text x="413" y="214" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="22"  font-size="12" fill="#888" font-family="sans-serif">v (m/s)</text>
+  <!-- Marcas t: 1-8  (px=50+t*40) -->
+  <line x1="90"  y1="207" x2="90"  y2="213" stroke="#888" stroke-width="1"/><text x="90"  y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="130" y1="207" x2="130" y2="213" stroke="#888" stroke-width="1"/><text x="130" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="170" y1="207" x2="170" y2="213" stroke="#888" stroke-width="1"/><text x="170" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="210" y1="207" x2="210" y2="213" stroke="#888" stroke-width="1"/><text x="210" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="250" y1="207" x2="250" y2="213" stroke="#888" stroke-width="1"/><text x="250" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <line x1="290" y1="207" x2="290" y2="213" stroke="#888" stroke-width="1"/><text x="290" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">6</text>
+  <line x1="330" y1="207" x2="330" y2="213" stroke="#888" stroke-width="1"/><text x="330" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">7</text>
+  <line x1="370" y1="207" x2="370" y2="213" stroke="#888" stroke-width="1"/><text x="370" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">8</text>
+  <!-- Marcas v: 8→y=130, 16→y=50  (y=210-v*10) -->
+  <line x1="47" y1="130" x2="53" y2="130" stroke="#888" stroke-width="1"/><text x="44" y="134" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">8</text>
+  <line x1="47" y1="50"  x2="53" y2="50"  stroke="#888" stroke-width="1"/><text x="44" y="54"  font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">16</text>
+  <!-- Moto X: v=2t → (50,210)→(370,50) -->
+  <line x1="50" y1="210" x2="370" y2="50" stroke="#185FA5" stroke-width="2.8" stroke-linecap="round"/>
+  <text x="374" y="48" font-size="14" fill="#185FA5" font-family="sans-serif" font-weight="800">X</text>
+  <!-- Moto Y: v=8 → y=130 -->
+  <line x1="50" y1="130" x2="370" y2="130" stroke="#0F6E56" stroke-width="2.8" stroke-linecap="round"/>
+  <text x="374" y="128" font-size="14" fill="#0F6E56" font-family="sans-serif" font-weight="800">Y</text>
+  <!-- Cruce velocidades: t=4,v=8 → (210,130) -->
+  <circle cx="210" cy="130" r="5.5" fill="#A32D2D"/>
+  <text x="218" y="125" font-size="11" fill="#A32D2D" font-family="sans-serif" font-weight="700">(4 s, 8 m/s)</text>
+  <!-- Zona donde v_X > v_Y (t=4..8), triángulo sombreado -->
+  <polygon points="210,130 370,50 370,130" fill="#185FA5" opacity="0.09"/>
+  <text x="318" y="96" font-size="10" fill="#185FA5" font-family="sans-serif" text-anchor="middle">X más rápida</text>
+</svg>`,
+opts:["En t = 4 s, cuando X alcanza la misma velocidad que Y. La aceleración de X es 4 m/s².",
+      "En t = 4 s, al cruzarse las velocidades X ya recorrió la misma distancia que Y. La aceleración de X es 2 m/s².",
+      "En t = 8 s, porque solo en ese instante las áreas bajo ambas curvas son iguales (64 m). La aceleración de X es 2 m/s².",
+      "Nunca se igualan las distancias porque Y siempre tuvo ventaja en los primeros 4 segundos."],
+cor:2,
+just:"La distancia es el área bajo v-t. <strong>Área Y (t=8):</strong> 8 × 8 = 64 m. <strong>Área X (t=8):</strong> ½ × 8 × 16 = 64 m. ✓ Se igualan en <strong>t = 8 s</strong>. Antes de t = 4 s, Y acumula más distancia; X lo compensa entre t = 4 y t = 8. Aceleración de X: a = Δv/Δt = 16/8 = <strong>2 m/s²</strong>."},
+
+/* ──────────── P10: MRUA dron — tangente e velocidad instantánea ────────────
+   x(t) = 2t².  v(t) = 4t.  En t=3: x=18 m, v=12 m/s
+   Escala: t→px=50+t*50,  x→y=210-x*4
+   Puntos parábola: t=0→(50,210), t=1→(100,202), t=2→(150,178),
+                    t=3→(200,138), t=4→(250,82), t=5→(300,10)
+   Tangente en t=3: pasa por (200,138), pendiente=-48px/50px
+     Desde (200,138): Δt=1.5s→Δpx=75 → izq: (125,210), der: (275,66)
+   Marcas y: 9m→174  18m→138  27m→102  36m→66
+──────────────────────────────────────────────────── */
+{tipo:"MRUA",graf:"Posición-tiempo",dif:"Alta",
+txt:"La posición de un dron que sube verticalmente sigue la ley x(t) = 2t². Un estudiante afirma: «La velocidad del dron en t = 3 s se obtiene midiendo la pendiente de la recta tangente a la curva en ese punto». ¿Es correcta esta afirmación y cuánto vale esa velocidad?",
+svg:`<svg viewBox="0 0 430 225" xmlns="http://www.w3.org/2000/svg">
+  <defs><marker id="ah10" markerWidth="7" markerHeight="7" refX="6" refY="3.5" orient="auto"><polygon points="0 0, 7 3.5, 0 7" fill="#888"/></marker></defs>
+  <line x1="50" y1="210" x2="410" y2="210" stroke="#888" stroke-width="1.3" marker-end="url(#ah10)"/>
+  <line x1="50" y1="210" x2="50"  y2="18"  stroke="#888" stroke-width="1.3" marker-end="url(#ah10)"/>
+  <text x="413" y="214" font-size="12" fill="#888" font-family="sans-serif">t (s)</text>
+  <text x="16"  y="18"  font-size="12" fill="#888" font-family="sans-serif">x (m)</text>
+  <!-- Marcas t: 1-5 s  (px=50+t*50) -->
+  <line x1="100" y1="207" x2="100" y2="213" stroke="#888" stroke-width="1"/><text x="100" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">1</text>
+  <line x1="150" y1="207" x2="150" y2="213" stroke="#888" stroke-width="1"/><text x="150" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">2</text>
+  <line x1="200" y1="207" x2="200" y2="213" stroke="#888" stroke-width="1"/><text x="200" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">3</text>
+  <line x1="250" y1="207" x2="250" y2="213" stroke="#888" stroke-width="1"/><text x="250" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">4</text>
+  <line x1="300" y1="207" x2="300" y2="213" stroke="#888" stroke-width="1"/><text x="300" y="223" font-size="11" fill="#888" font-family="sans-serif" text-anchor="middle">5</text>
+  <!-- Marcas x: 9→174  18→138  27→102  36→66  (y=210-x*4) -->
+  <line x1="47" y1="174" x2="53" y2="174" stroke="#888" stroke-width="1"/><text x="44" y="178" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">9</text>
+  <line x1="47" y1="138" x2="53" y2="138" stroke="#888" stroke-width="1"/><text x="44" y="142" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">18</text>
+  <line x1="47" y1="102" x2="53" y2="102" stroke="#888" stroke-width="1"/><text x="44" y="106" font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">27</text>
+  <line x1="47" y1="66"  x2="53" y2="66"  stroke="#888" stroke-width="1"/><text x="44" y="70"  font-size="11" fill="#888" font-family="sans-serif" text-anchor="end">36</text>
+  <!-- Parábola x=2t²: puntos exactos calculados
+       t=0→(50,210) t=1→(100,202) t=2→(150,178) t=3→(200,138) t=4→(250,82) t=5→(300,10) -->
+  <polyline points="50,210 100,202 150,178 200,138 250,82 300,10"
+    fill="none" stroke="#185FA5" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <!-- Punto de contacto de la tangente: t=3 → (200,138) -->
+  <circle cx="200" cy="138" r="5.5" fill="#185FA5"/>
+  <!-- Tangente en t=3: v=12 m/s
+       Desde (200,138): izq Δt=-1.5s→(-75px,+72px)=(125,210); der Δt=+1.5s→(+75px,-72px)=(275,66) -->
+  <line x1="125" y1="210" x2="275" y2="66" stroke="#A32D2D" stroke-width="2" stroke-dasharray="6 3"/>
+  <text x="279" y="63" font-size="11" fill="#A32D2D" font-family="sans-serif" font-weight="700">Tangente</text>
+  <!-- Coordenada del punto -->
+  <text x="206" y="134" font-size="11" fill="#185FA5" font-family="sans-serif" font-weight="600">(3 s, 18 m)</text>
+  <!-- Ley en la gráfica -->
+  <text x="318" y="48" font-size="12" fill="#185FA5" font-family="sans-serif" font-style="italic" font-weight="600">x(t) = 2t²</text>
+</svg>`,
+opts:["La afirmación es incorrecta. En una curva, la velocidad se calcula como: v = x/t = 18/3 = 6 m/s.",
+      "La afirmación es correcta. La pendiente de la tangente da la velocidad instantánea, que vale v = 12 m/s.",
+      "La afirmación es correcta, pero la velocidad en t = 3 s es 18 m/s, que corresponde a la posición en ese instante.",
+      "La afirmación es incorrecta; en una gráfica curva no existe ningún método gráfico para hallar la velocidad."],
+cor:1,
+just:"La afirmación es <strong>correcta</strong>. En una gráfica posición-tiempo curva (MRUA), la <strong>velocidad instantánea</strong> en un punto es la pendiente de la recta tangente en ese punto. Para x(t) = 2t²: v(t) = 4t → en t = 3 s: <em>v = 4 × 3 = 12 m/s</em>. La opción A calcula velocidad promedio (x/t), no velocidad instantánea."}
+
+]; // fin QS
+
+/* ══════════════ LÓGICA DE LA APLICACIÓN ══════════════ */
+const ST = { act:0, resp:{} };
+const LETS = ['A','B','C','D'];
+
+function ncor(){let c=0;for(const k in ST.resp)if(ST.resp[k]===QS[k].cor)c++;return c;}
+function nresp(){return Object.keys(ST.resp).length;}
+
+function updBar(){
+  const r=nresp(),c=ncor();
+  document.getElementById('pf').style.width=(r/QS.length*100)+'%';
+  document.getElementById('ps').textContent=c+' / '+r;
+}
+
+function renderNav(){
+  document.getElementById('nav').innerHTML=QS.map((_,i)=>{
+    let cl='pill';
+    if(i===ST.act)cl+=' act';
+    else if(ST.resp[i]!==undefined)cl+=ST.resp[i]===QS[i].cor?' ok':' fail';
+    return`<button class="${cl}" onclick="goTo(${i})">${i+1}</button>`;
+  }).join('');
+}
+
+function badges(q){
+  const tc=q.tipo==='MRU'?'b-mru':'b-mrua';
+  const gc=q.graf.includes('Pos')?'b-pos':'b-vel';
+  const dc={Baja:'b-baja',Media:'b-media',Alta:'b-alta'}[q.dif]||'b-baja';
+  return`<span class="badge ${tc}">${q.tipo}</span><span class="badge ${gc}">${q.graf}</span><span class="badge ${dc}">Dificultad ${q.dif}</span>`;
+}
+
+function renderQ(i){
+  const q=QS[i], r=ST.resp[i], done=r!==undefined;
+  const opts=q.opts.map((op,j)=>{
+    let cl='opt';
+    if(done){cl+=' dis';if(j===q.cor)cl+=' cor';else if(j===r)cl+=' wrg';}
+    return`<button class="${cl}"${!done?` onclick="pick(${i},${j})"`:''}>
+      <span class="oletter">${LETS[j]}</span><span>${op}</span></button>`;
+  }).join('');
+  const fb=done?`<div class="fb ${r===q.cor?'ok':'fail'} show">
+    <div class="fbtitle">${r===q.cor?'✓ ¡Correcto!':'✗ Respuesta incorrecta'}</div>${q.just}</div>`:'';
+  const prev=i>0?`<button class="btn" onclick="goTo(${i-1})">← Anterior</button>`:`<span></span>`;
+  const next=i<QS.length-1
+    ?`<button class="btn btnp" onclick="goTo(${i+1})">Siguiente →</button>`
+    :`<button class="btn btnp" onclick="showRes()">Ver resultados →</button>`;
+  document.getElementById('qcard').innerHTML=`
+    <div class="qhead"><div><div class="qnum">Pregunta ${i+1} de ${QS.length}</div><div class="badges">${badges(q)}</div></div></div>
+    <div class="qbody">
+      <p class="qtxt">${q.txt}</p>
+      <div class="svgwrap">${q.svg}</div>
+      <p class="hint">💡 Analiza la gráfica con detenimiento antes de responder.</p>
+      <div class="opts">${opts}</div>${fb}
+    </div>
+    <div class="qfoot">${prev}${next}</div>`;
+}
+
+function goTo(i){
+  document.getElementById('rpanel').classList.remove('on');
+  document.getElementById('qmain').style.display='';
+  document.querySelector('.nav-wrap').style.display='';
+  ST.act=i; renderNav(); renderQ(i); updBar();
+  document.querySelector('.sticky').scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+
+function pick(qi,oi){
+  if(ST.resp[qi]!==undefined)return;
+  ST.resp[qi]=oi; renderNav(); renderQ(qi); updBar();
+}
+
+function showRes(){
+  const tot=QS.length,c=ncor(),r=nresp(),inc=r-c;
+  const pct=Math.round(c/tot*100);
+  let em,ti;
+  if(pct>=90){em='🏆';ti='¡Excelente trabajo!';}
+  else if(pct>=70){em='🎉';ti='¡Muy bien!';}
+  else if(pct>=50){em='📚';ti='Buen intento, sigue practicando';}
+  else{em='💪';ti='¡No te rindas, repasa los conceptos!';}
+  const rev=QS.map((q,i)=>{
+    const ok=ST.resp[i]===q.cor;
+    return`<div class="revitem ${ok?'ok':'fail'}">
+      <span class="revnum">${i+1}</span>
+      <span class="revicon">${ok?'✓':'✗'}</span>
+      <span class="revtxt">${q.txt.substring(0,75)}…</span>
+      <button class="btnrev" onclick="goTo(${i})">Revisar</button></div>`;
+  }).join('');
+  document.getElementById('rpanel').innerHTML=`
+    <div class="rcrd">
+      <div class="remoji">${em}</div>
+      <div class="rtitle">${ti}</div>
+      <div class="rsub">Taller de Cinemática · Grado 10°</div>
+      <div class="rbig">${pct}%</div>
+      <div class="rbiglbl">de aciertos sobre ${tot} preguntas</div>
+      <div class="rgrid">
+        <div class="rstat g"><div class="rstat-val">${c}</div><div class="rstat-lbl">Correctas</div></div>
+        <div class="rstat r"><div class="rstat-val">${inc}</div><div class="rstat-lbl">Incorrectas</div></div>
+      </div>
+      <button class="btn btnp" style="padding:10px 28px;font-size:14px" onclick="restart()">🔄 Intentar de nuevo</button>
+    </div>
+    <div class="revh">Revisión de respuestas</div>
+    <div class="revlist">${rev}</div>`;
+  document.getElementById('qmain').style.display='none';
+  document.querySelector('.nav-wrap').style.display='none';
+  document.getElementById('rpanel').classList.add('on');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function restart(){
+  ST.act=0;
+  for(const k in ST.resp)delete ST.resp[k];
+  goTo(0);
+}
+
+goTo(0);
+</script>
+</body>
+</html>
